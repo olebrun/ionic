@@ -82,6 +82,7 @@ function($ionicModal, $ionicPosition, $document, $window) {
   var POPOVER_BODY_PADDING = 6;
 
   var POPOVER_OPTIONS = {
+    position: 'bottom',
     viewType: 'popover',
     hideDelay: 1,
     animation: 'none',
@@ -98,33 +99,75 @@ function($ionicModal, $ionicPosition, $document, $window) {
     var bodyWidth = $window.innerWidth;
     var bodyHeight = $window.innerHeight;
 
-    var popoverCSS = {
-      left: buttonOffset.left + buttonOffset.width / 2 - popoverWidth / 2
-    };
-    var arrowEle = jqLite(popoverEle[0].querySelector('.popover-arrow'));
+    if(POPOVER_OPTIONS.position == 'bottom' ) {
+      var popoverCSS = {
+        left: buttonOffset.left + buttonOffset.width / 2 - popoverWidth / 2
+      };
+      var arrowEle = jqLite(popoverEle[0].querySelector('.popover-arrow'));
+  
+      if (popoverCSS.left < POPOVER_BODY_PADDING) {
+        popoverCSS.left = POPOVER_BODY_PADDING;
+      } else if (popoverCSS.left + popoverWidth + POPOVER_BODY_PADDING > bodyWidth) {
+        popoverCSS.left = bodyWidth - popoverWidth - POPOVER_BODY_PADDING;
+      }
+  
+      // If the popover when popped down stretches past bottom of screen,
+      // make it pop up if there's room above
+      if (buttonOffset.top + buttonOffset.height + popoverHeight > bodyHeight &&
+          buttonOffset.top - popoverHeight > 0) {
+        popoverCSS.top = buttonOffset.top - popoverHeight;
+        popoverEle.addClass('popover-bottom');
+      } else {
+        popoverCSS.top = buttonOffset.top + buttonOffset.height;
+        popoverEle.removeClass('popover-bottom');
+      }
+  
+      arrowEle.css({
+        left: buttonOffset.left + buttonOffset.width / 2 -
+          arrowEle.prop('offsetWidth') / 2 - popoverCSS.left + 'px'
+      });
 
-    if (popoverCSS.left < POPOVER_BODY_PADDING) {
-      popoverCSS.left = POPOVER_BODY_PADDING;
-    } else if (popoverCSS.left + popoverWidth + POPOVER_BODY_PADDING > bodyWidth) {
-      popoverCSS.left = bodyWidth - popoverWidth - POPOVER_BODY_PADDING;
-    }
+    } if(POPOVER_OPTIONS.position == 'right' ) {
 
-    // If the popover when popped down stretches past bottom of screen,
-    // make it pop up if there's room above
-    if (buttonOffset.top + buttonOffset.height + popoverHeight > bodyHeight &&
-        buttonOffset.top - popoverHeight > 0) {
-      popoverCSS.top = buttonOffset.top - popoverHeight;
+      var arrowEleCSS = {
+        left: -20,
+        top: buttonOffset.height / 2
+      }
+
+      var popoverCSS = {
+        left: buttonOffset.left + buttonOffset.width + 12,
+        top: buttonOffset.top
+      };
+      var arrowEle = jqLite(popoverEle[0].querySelector('.popover-arrow'));
+
+      if ((popoverCSS.top + popoverHeight) > (bodyHeight - POPOVER_BODY_PADDING)) {
+
+        popoverCSS.top = bodyHeight - POPOVER_BODY_PADDING - popoverHeight;
+        arrowEleCSS.top += (buttonOffset.top - popoverCSS.top);
+      }
+
+      // If the popover when popped down stretches past bottom of screen,
+      // make it pop up if there's room above
+      if((popoverCSS.left + popoverWidth) > (bodyWidth - POPOVER_BODY_PADDING)){
+        popoverCSS.left = buttonOffset.left - popoverWidth - 12;
+        arrowEleCSS.left = popoverWidth;
+
+        arrowEle.removeClass('popover-arrow');
+        arrowEle.addClass('popover-arrow-right');
+      } else {
+        arrowEle.removeClass('popover-arrow');
+        arrowEle.addClass('popover-arrow-left');
+      }
+
       popoverEle.addClass('popover-bottom');
-    } else {
-      popoverCSS.top = buttonOffset.top + buttonOffset.height;
-      popoverEle.removeClass('popover-bottom');
+
+      arrowEle.css({
+        left: arrowEleCSS.left + 'px',
+        top: arrowEleCSS.top + 'px'
+      });
+
     }
-
-    arrowEle.css({
-      left: buttonOffset.left + buttonOffset.width / 2 -
-        arrowEle.prop('offsetWidth') / 2 - popoverCSS.left + 'px'
-    });
-
+    
     popoverEle.css({
       top: popoverCSS.top + 'px',
       left: popoverCSS.left + 'px',
