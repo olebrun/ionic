@@ -86,7 +86,7 @@
   .popover .scroll-content.has-header {
     margin-top: 0;
   }
-  .popover-arrow {
+  .popover-arrow, .popover-arrow-right, .popover-arrow-left {
     position: absolute;
     display: block;
     top: -17px;
@@ -104,6 +104,20 @@
       border-radius: 3px;
       content: '';
       @include rotate(-45deg);
+    }
+  }
+  .popover-arrow-right, .popover-arrow-left {
+    top: -17px;
+    width: 19px;
+    
+    &:after {
+      .popover-arrow-right:after, .popover-arrow-left:after{
+        top: 0px;
+        left: -12px;
+      }
+      .popover-arrow-left:after {
+        left: 12px;
+      }
     }
   }
   .popover-bottom .popover-arrow {
